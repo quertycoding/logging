@@ -57,3 +57,17 @@ app.post("/save", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+app.get("/entries", (req, res) => {
+
+    fs.readFile("entries.txt", "utf8", (err, data) => {
+
+        if (err) {
+            return res.status(500).send("Cannot read entries")
+        }
+
+        res.type("text/plain").send(data)
+
+    })
+
+})
