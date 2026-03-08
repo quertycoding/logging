@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Entry</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 680px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 16px;
+        border: 1px solid #ddd;
+      }
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        padding: 10px;
+        border: 1px solid #bbb;
+        resize: vertical;
+      }
+      button {
+        margin-top: 10px;
+        padding: 8px 14px;
+        border: 1px solid #111;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <form method="post" action="/save">
+        <textarea name="entry" placeholder="Write your entry here..." required></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </main>
+  </body>
+</html>
