@@ -5,74 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Entry</title>
     <style>
+      :root {
+        --bg: #eef2f7;
+        --card: #ffffff;
+        --border: #d7deea;
+        --text: #111827;
+        --muted: #4b5563;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --secondary: #374151;
+        --secondary-hover: #1f2937;
+        --success-bg: #ecfdf3;
+        --success-text: #166534;
+        --error-bg: #fef2f2;
+        --error-text: #b91c1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, #f8fbff 0%, var(--bg) 60%);
       }
+
       .container {
-        max-width: 760px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 16px;
-        border: 1px solid #ddd;
+        max-width: 860px;
+        margin: 32px auto;
+        padding: 0 16px;
       }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(17, 24, 39, 0.07);
+        padding: 22px;
+      }
+
       h1 {
-        margin: 0 0 12px;
-        font-size: 1.3rem;
+        margin: 0 0 6px;
+        font-size: 1.4rem;
       }
+
+      .subtitle {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
       label {
         display: block;
-        margin: 10px 0 6px;
+        margin: 12px 0 6px;
+        font-size: 0.92rem;
         font-weight: 600;
+        color: var(--muted);
       }
+
       textarea {
         width: 100%;
-        min-height: 140px;
-        padding: 10px;
-        border: 1px solid #bbb;
+        min-height: 150px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        font: inherit;
+        line-height: 1.45;
         resize: vertical;
       }
-      textarea[readonly] {
-        background: #fafafa;
+
+      textarea:focus {
+        outline: 2px solid #bfdbfe;
+        border-color: #93c5fd;
       }
+
+      textarea[readonly] {
+        background: #f9fafb;
+      }
+
       .actions {
         display: flex;
         gap: 10px;
-        margin-top: 10px;
+        margin-top: 12px;
       }
+
       button {
-        padding: 8px 14px;
-        border: 1px solid #111;
-        background: #111;
+        border: 0;
+        border-radius: 9px;
+        padding: 9px 14px;
         color: #fff;
+        font-weight: 600;
         cursor: pointer;
       }
-      button:hover {
-        opacity: 0.9;
+
+      #saveBtn {
+        background: var(--primary);
       }
+
+      #saveBtn:hover {
+        background: var(--primary-hover);
+      }
+
+      #editFullBtn {
+        background: var(--secondary);
+      }
+
+      #editFullBtn:hover {
+        background: var(--secondary-hover);
+      }
+
       .status {
-        margin-top: 10px;
+        margin-top: 12px;
+        padding: 8px 10px;
+        border-radius: 8px;
         font-size: 0.92rem;
-        color: #333;
+        display: none;
+      }
+
+      .status.success {
+        display: block;
+        background: var(--success-bg);
+        color: var(--success-text);
+        border: 1px solid #bbf7d0;
+      }
+
+      .status.error {
+        display: block;
+        background: var(--error-bg);
+        color: var(--error-text);
+        border: 1px solid #fecaca;
       }
     </style>
   </head>
   <body>
     <main class="container">
-      <h1>Log Entry</h1>
-      <label for="topBox">Add new text</label>
-      <textarea id="topBox" placeholder="Write your entry here..."></textarea>
+      <section class="card">
+        <h1>Log Entry</h1>
+        <p class="subtitle">Add quick notes, or load and edit the full saved text.</p>
 
-      <div class="actions">
-        <button id="saveBtn" type="button">Save</button>
-        <button id="editFullBtn" type="button">Edit Full Text</button>
-      </div>
+        <label for="topBox">Add New Text</label>
+        <textarea id="topBox" placeholder="Write your entry here..."></textarea>
 
-      <label for="bottomBox">Saved text (read only)</label>
-      <textarea id="bottomBox" readonly></textarea>
+        <div class="actions">
+          <button id="saveBtn" type="button">Save</button>
+          <button id="editFullBtn" type="button">Edit Full Text</button>
+        </div>
 
-      <p id="status" class="status"></p>
+        <label for="bottomBox">Saved Text (Read Only)</label>
+        <textarea id="bottomBox" readonly></textarea>
+
+        <p id="status" class="status"></p>
+      </section>
     </main>
 
     <script>
@@ -90,21 +175,22 @@
         bottomBox.value = data.text || "";
       }
 
-      function setStatus(message) {
+      function setStatus(message, type) {
         status.textContent = message;
+        status.className = `status ${type}`;
       }
 
       editFullBtn.addEventListener("click", () => {
         topBox.value = bottomBox.value;
         mode = "full";
-        setStatus("Full edit mode enabled. Save will overwrite all text.");
+        setStatus("Full edit mode enabled. Save will overwrite all text.", "success");
       });
 
       saveBtn.addEventListener("click", async () => {
         const entry = topBox.value;
 
         if (mode === "append" && !entry.trim()) {
-          setStatus("Entry cannot be empty.");
+          setStatus("Entry cannot be empty.", "error");
           return;
         }
 
@@ -117,17 +203,17 @@
         const data = await response.json();
 
         if (!response.ok) {
-          setStatus(data.error || "Failed to save entry.");
+          setStatus(data.error || "Failed to save entry.", "error");
           return;
         }
 
         bottomBox.value = data.text || "";
         topBox.value = "";
         mode = "append";
-        setStatus("Saved.");
+        setStatus("Saved.", "success");
       });
 
-      loadEntries().catch(() => setStatus("Failed to load existing entries."));
+      loadEntries().catch(() => setStatus("Failed to load existing entries.", "error"));
     </script>
   </body>
 </html>
