@@ -58,16 +58,17 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
+
 app.get("/entries", (req, res) => {
 
-    fs.readFile("entries.txt", "utf8", (err, data) => {
+    fs.readFile("entries.txt","utf8",(err,data)=>{
 
-        if (err) {
-            return res.status(500).send("Cannot read entries")
+        if(err){
+            return res.json([])
         }
 
-        res.type("text/plain").send(data)
-
+        const entries = data.split("\n\n")
+        res.json(entries)
     })
 
 })
